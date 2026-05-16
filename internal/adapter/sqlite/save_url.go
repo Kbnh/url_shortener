@@ -1,22 +1,17 @@
 package sqlite
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Kbnh/url_shortener/internal/domain"
 	"github.com/mattn/go-sqlite3"
 )
 
-func (s *Storage) SaveURL(urlToSave, alias string) (int64, error) {
-	query, err := s.db.Prepare(`
-	INSERT INTO url(url, alias)
-	VALUES(?, ?)
-	`)
-	if err != nil {
-		return 0, fmt.Errorf("s.db.Prepare: %w", err)
-	}
+func (s *Storage) SaveURL(ctx context.Context, urlToSave, alias string) (int64, error) {
+	query := `INSERT INTO url(url, alias) VALUES(?, ?)`
 
-	res, err := query.Exec(urlToSave, alias)
+	res, err := s.db.ExecContext(ctx, query, urlToSave, alias)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return 0, fmt.Errorf("query.Exec: %w", domain.ErrURLExists)

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	httpserver "github.com/Kbnh/url_shortener/internal/http_server"
-	sqlite "github.com/Kbnh/url_shortener/internal/storage/sqlite"
+	"github.com/Kbnh/url_shortener/internal/adapter/sqlite"
+	"github.com/Kbnh/url_shortener/internal/controller/httpserver"
 	"github.com/Kbnh/url_shortener/pkg/logger"
 
 	"github.com/ilyakaznacheev/cleanenv"

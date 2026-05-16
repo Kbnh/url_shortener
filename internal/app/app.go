@@ -2,48 +2,63 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
-	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/Kbnh/url_shortener/config"
-	v1 "github.com/Kbnh/url_shortener/internal/controller/v1"
-	mwLogger "github.com/Kbnh/url_shortener/internal/http_server/middleware/logger"
-	"github.com/Kbnh/url_shortener/internal/storage/sqlite"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/Kbnh/url_shortener/internal/adapter/sqlite"
+	"github.com/Kbnh/url_shortener/internal/controller/httpserver"
+	"github.com/Kbnh/url_shortener/internal/controller/router"
+	"github.com/Kbnh/url_shortener/internal/usecase"
 )
 
-func Run(ctx context.Context, log *slog.Logger, c config.Config) {
+func Run(ctx context.Context, log *slog.Logger, c config.Config) error {
 	storage, err := sqlite.New(c.Sqlite)
 	if err != nil {
-		log.Error("sqllite.New", slog.String("error", err.Error()))
-		os.Exit(1)
+		log.Error("sqlite.New", slog.String("error", err.Error()))
+		return err
 	}
 
-	router := chi.NewRouter()
-	router.Use(
-		middleware.RequestID,
-		mwLogger.New(log),
-		middleware.Recoverer,
-	)
+	uc := usecase.New(storage)
 
-	router.Post("/url", v1.SaveURL(log, storage))
+	router := router.New(log, uc)
+
+	srv := httpserver.New(httpserver.Config(c.HTTPServer), router)
 
 	log.Info("starting server", slog.String("address", c.HTTPServer.Address))
 
-	srv := &http.Server{
-		Addr:         c.HTTPServer.Address,
-		Handler:      router,
-		ReadTimeout:  c.HTTPServer.Timeout,
-		WriteTimeout: c.HTTPServer.Timeout,
-		IdleTimeout:  c.HTTPServer.IdleTimeout,
+	srvErr := make(chan error, 1)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			srvErr <- fmt.Errorf("server failed: %w", err)
+		}
+	}()
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	case <-sig:
+		log.Info("shutdown signal recieved")
+	case err := <-srvErr:
+		return err
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		log.Error("failed to start server")
+	log.Info("shutting down server...")
+
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		log.Error("server shutdown failed", slog.Any("error", err))
 	}
 
-	log.Error("server stopped")
+	log.Info("server stopped")
+
+	return nil
 
 }

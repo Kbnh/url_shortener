@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -8,17 +9,12 @@ import (
 	"github.com/Kbnh/url_shortener/internal/domain"
 )
 
-func (s *Storage) GetURL(alias string) (string, error) {
-	query, err := s.db.Prepare(`
-	SELECT url FROM url
-	WHERE alias = ?
-	`)
-	if err != nil {
-		return "", fmt.Errorf("s.db.Prepare: %w", err)
-	}
+func (s *Storage) GetURL(ctx context.Context, alias string) (string, error) {
+	query := `SELECT url FROM url WHERE alias = ?`
 
 	var res string
-	if err = query.QueryRow(alias).Scan(&res); err != nil {
+
+	if err := s.db.QueryRowContext(ctx, query, alias).Scan(&res); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", fmt.Errorf("query.QueryRow: %w", domain.ErrURLNotFound)
 		}

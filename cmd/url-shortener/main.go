@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log/slog"
+	"os"
 
 	"github.com/Kbnh/url_shortener/config"
 	"github.com/Kbnh/url_shortener/internal/app"
@@ -17,10 +18,10 @@ func main() {
 
 	ctx := context.Background()
 
-	app.Run(ctx, log, *cfg)
-	// TODO: app run:
-	// 			init storage
-	// 			init router
-	// 			run server
+	err := app.Run(ctx, log, *cfg)
+	if err != nil {
+		log.Error("failed app run")
+		os.Exit(1)
+	}
 
 }

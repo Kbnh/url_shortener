@@ -7,7 +7,7 @@ const (
 
 type Params struct {
 	Status string `json:"status"`
-	Error  string `json:"error,omitepty"`
+	Error  string `json:"error,omitempty"`
 }
 
 func OK() Params {
