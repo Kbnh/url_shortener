@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/Kbnh/url_shortener/config"
-	"github.com/Kbnh/url_shortener/internal/app"
+	"github.com/Kbnh/url_shortener/internal/usecase"
 	"github.com/Kbnh/url_shortener/pkg/logger"
 )
 
@@ -17,7 +17,7 @@ func main() {
 
 	ctx := context.Background()
 
-	app.Run(ctx, log, *cfg)
+	usecase.Run(ctx, log, *cfg)
 	// TODO: app run:
 	// 			init storage
 	// 			init router

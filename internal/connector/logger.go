@@ -1,4 +1,4 @@
-package logger
+package connector
 
 import (
 	"log/slog"

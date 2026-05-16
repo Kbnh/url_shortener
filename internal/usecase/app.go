@@ -1,4 +1,4 @@
-package app
+package usecase
 
 import (
 	"context"
@@ -7,15 +7,15 @@ import (
 	"os"
 
 	"github.com/Kbnh/url_shortener/config"
-	v1 "github.com/Kbnh/url_shortener/internal/controller/v1"
-	mwLogger "github.com/Kbnh/url_shortener/internal/http_server/middleware/logger"
-	"github.com/Kbnh/url_shortener/internal/storage/sqlite"
+	"github.com/Kbnh/url_shortener/internal/adapter/http"
+	"github.com/Kbnh/url_shortener/internal/adapter/storage"
+	"github.com/Kbnh/url_shortener/internal/connector"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
 func Run(ctx context.Context, log *slog.Logger, c config.Config) {
-	storage, err := sqlite.New(c.Sqlite)
+	storage, err := storage.New(c.Sqlite)
 	if err != nil {
 		log.Error("sqllite.New", slog.String("error", err.Error()))
 		os.Exit(1)
@@ -24,11 +24,11 @@ func Run(ctx context.Context, log *slog.Logger, c config.Config) {
 	router := chi.NewRouter()
 	router.Use(
 		middleware.RequestID,
-		mwLogger.New(log),
+		connector.New(log),
 		middleware.Recoverer,
 	)
 
-	router.Post("/url", v1.SaveURL(log, storage))
+	router.Post("/url", http.SaveURL(log, storage))
 
 	log.Info("starting server", slog.String("address", c.HTTPServer.Address))
 
