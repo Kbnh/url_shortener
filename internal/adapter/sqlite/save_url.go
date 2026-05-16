@@ -22,6 +22,7 @@ func (s *Storage) SaveURL(ctx context.Context, urlToSave, alias string) (int64, 
 	id, err := res.LastInsertId()
 	if err != nil {
 		fmt.Errorf("res.LastInsertId: %w", err)
+		return 0, err
 	}
 
 	return id, nil

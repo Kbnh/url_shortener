@@ -7,5 +7,5 @@ type SaveURLRequest struct {
 
 type SaveURLResponse struct {
 	Params
-	Alias string `json:"alias"`
+	ID int64 `json:"id"`
 }

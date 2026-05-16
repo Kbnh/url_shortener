@@ -13,10 +13,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-const aliasLenght = 6
-
 type URLSaver interface {
-	SaveURL(ctx context.Context, url, alias string) (string, error)
+	SaveURL(ctx context.Context, url, alias string) (int64, error)
 }
 
 func SaveURL(log *slog.Logger, uc URLSaver) http.HandlerFunc {
@@ -52,10 +50,10 @@ func SaveURL(log *slog.Logger, uc URLSaver) http.HandlerFunc {
 			return
 		}
 
-		log.Info("url saved", slog.String("alias", res))
+		log.Info("url saved", slog.Int64("id", res))
 		render.JSON(w, r, dto.SaveURLResponse{
 			Params: dto.OK(),
-			Alias:  res,
+			ID:     res,
 		})
 	}
 }

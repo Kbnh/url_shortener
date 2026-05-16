@@ -32,6 +32,8 @@ func New(c Config) (*Storage, error) {
 		return nil, fmt.Errorf("db.Prepare: %w", err)
 	}
 
+	defer query.Close()
+
 	_, err = query.Exec()
 	if err != nil {
 		return nil, fmt.Errorf("query.Exec: %w", err)

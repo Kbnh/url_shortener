@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	Env string `env:"ENV" env-default:"local"`
+	Env string `env:"ENV" env-required:"true"`
 }
 
 var (

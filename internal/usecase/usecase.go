@@ -17,4 +17,4 @@ func New(repo Repo) *UseCase {
 	}
 }
 
-const aliasLenght = 6
+const aliasLength = 6
