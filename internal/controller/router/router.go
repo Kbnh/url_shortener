@@ -11,7 +11,7 @@ import (
 )
 
 type UseCase interface {
-	SaveURL(ctx context.Context, url, alias string) (string, error)
+	SaveURL(ctx context.Context, url, alias string) (int64, error)
 	GetURL(ctx context.Context, alias string) (string, error)
 }
 
