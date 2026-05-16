@@ -21,20 +21,14 @@ func New(c Config) (*Storage, error) {
 		return nil, fmt.Errorf("sql.Open: %w", err)
 	}
 
-	query, err := db.Prepare(`
+	query := `
 	CREATE TABLE IF NOT EXISTS url(
 		id INTEGER PRIMARY KEY,
 		alias TEXT NOT NULL UNIQUE,
 		url TEXT NOT NULL);	
-	CREATE INDEX IF NOT EXISTS idx_alias ON url(alias);	
-	`)
-	if err != nil {
-		return nil, fmt.Errorf("db.Prepare: %w", err)
-	}
+	CREATE INDEX IF NOT EXISTS idx_alias ON url(alias);	`
 
-	defer query.Close()
-
-	_, err = query.Exec()
+	_, err = db.Exec(query)
 	if err != nil {
 		return nil, fmt.Errorf("query.Exec: %w", err)
 	}
