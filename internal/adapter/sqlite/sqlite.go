@@ -21,17 +21,11 @@ func New(c Config) (*Storage, error) {
 		return nil, fmt.Errorf("sql.Open: %w", err)
 	}
 
-	query := `
-	CREATE TABLE IF NOT EXISTS url(
-		id INTEGER PRIMARY KEY,
-		alias TEXT NOT NULL UNIQUE,
-		url TEXT NOT NULL);	
-	CREATE INDEX IF NOT EXISTS idx_alias ON url(alias);	`
-
-	_, err = db.Exec(query)
-	if err != nil {
-		return nil, fmt.Errorf("query.Exec: %w", err)
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("db.Ping: %w", err)
 	}
+
+	db.SetMaxOpenConns(1)
 
 	return &Storage{db: db}, nil
 }
