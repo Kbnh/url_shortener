@@ -24,9 +24,7 @@ func Run(ctx context.Context, log *slog.Logger, c config.Config) error {
 	}
 
 	uc := usecase.New(storage)
-
 	router := router.New(log, uc)
-
 	srv := httpserver.New(httpserver.Config(c.HTTPServer), router)
 
 	log.Info("starting server", slog.String("address", c.HTTPServer.Address))
@@ -38,11 +36,11 @@ func Run(ctx context.Context, log *slog.Logger, c config.Config) error {
 		}
 	}()
 
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
 	select {
-	case <-sig:
+	case <-ctx.Done():
 		log.Info("shutdown signal recieved")
 	case err := <-srvErr:
 		return err
