@@ -24,9 +24,7 @@ func GetURL(log *slog.Logger, uc URLGetter) http.HandlerFunc {
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		var req string
-
-		req = chi.URLParam(r, "alias")
+		req := chi.URLParam(r, "alias")
 		if req == "" {
 			log.Error("chi.URLParam", slog.Any("error", domain.ErrInvalidInput))
 

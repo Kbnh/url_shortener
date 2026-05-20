@@ -39,7 +39,7 @@ func New() (Config, error) {
 func MustLoad() *Config {
 	c, err := New()
 	if err != nil {
-		log.Fatalf("config.MustLoad: %w", err)
+		log.Fatalf("config.MustLoad: %v", err)
 	}
 	return &c
 }

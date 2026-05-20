@@ -50,7 +50,5 @@ func DeleteURL(log *slog.Logger, uc URLDeleter) http.HandlerFunc {
 		log.Info("url deleted")
 		w.WriteHeader(http.StatusNoContent)
 
-		return
-
 	}
 }
