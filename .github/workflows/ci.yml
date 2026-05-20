@@ -19,7 +19,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.24'
+        go-version: '1.25'
         cache: true
 
     - name: Download dependencies
@@ -28,7 +28,7 @@ jobs:
     - name: Linter
       uses: golangci/golangci-lint-action@v6
       with:
-        version: latest
+        version: v1.64.2
         args: --timeout=5m
 
     - name: Run tests with coverage
