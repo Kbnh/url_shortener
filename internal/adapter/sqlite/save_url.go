@@ -14,9 +14,9 @@ func (s *Storage) SaveURL(ctx context.Context, urlToSave, alias string) (int64, 
 	res, err := s.db.ExecContext(ctx, query, urlToSave, alias)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return 0, fmt.Errorf("query.Exec: %w", domain.ErrURLExists)
+			return 0, fmt.Errorf("s.db.ExecContext: %w", domain.ErrURLExists)
 		}
-		return 0, fmt.Errorf("query.Exec: %w", err)
+		return 0, fmt.Errorf("s.db.ExecContext: %w", err)
 	}
 
 	id, err := res.LastInsertId()

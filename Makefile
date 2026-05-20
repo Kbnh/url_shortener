@@ -1,12 +1,12 @@
 .PHONY: run migrate-up migrate-down
 
-DB_PATH ?= out/url-shortener.db
+DB_PATH ?= ./out/storage.db
 
-run: migrate-up
+run:
 	go run ./cmd/url-shortener
 
 migrate-up:
-	migrate -path migrations -database "sqlite3://$(DB_PATH)" up
+	migrate -path migrations -database "sqlite://$(DB_PATH)" up
 	
 migrate-down:
-	migrate -path migrations -database "sqlite3://$(DB_PATH)" down
+	migrate -path migrations -database "sqlite://$(DB_PATH)" down

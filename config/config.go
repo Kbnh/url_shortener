@@ -7,9 +7,9 @@ import (
 	"github.com/Kbnh/url_shortener/internal/adapter/sqlite"
 	"github.com/Kbnh/url_shortener/internal/controller/httpserver"
 	"github.com/Kbnh/url_shortener/pkg/logger"
+	"github.com/joho/godotenv"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/joho/godotenv"
 )
 
 type App struct { // Конфигурация приложения

@@ -6,9 +6,11 @@ import (
 )
 
 type Config struct {
-	Address     string        `env:"ADDR" env-default:"localhost:8080"`
-	Timeout     time.Duration `env:"TIMEOUT" env-default:"5s"`
-	IdleTimeout time.Duration `env:"IDLE_TIMEOUT" env-default:"60s"`
+	Address     string        `env:"ADDR"            env-default:"localhost:8080"`
+	Timeout     time.Duration `env:"TIMEOUT"         env-default:"5s"`
+	IdleTimeout time.Duration `env:"IDLE_TIMEOUT"    env-default:"60s"`
+	User        string        `env:"USER"            env-required:"true"`
+	Password    string        `env:"SERVER_PASSWORD" env-required:"true"`
 }
 
 type Server struct {

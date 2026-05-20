@@ -35,7 +35,7 @@ func GetURL(log *slog.Logger, uc URLGetter) http.HandlerFunc {
 			return
 		}
 
-		log.Info("Request body decoded", slog.Any("request", req))
+		log.Info("Request body decoded", slog.String("request", req))
 
 		res, err := uc.GetURL(r.Context(), req)
 		if err != nil {

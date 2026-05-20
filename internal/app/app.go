@@ -24,7 +24,7 @@ func Run(ctx context.Context, log *slog.Logger, c config.Config) error {
 	}
 
 	uc := usecase.New(storage)
-	router := router.New(log, uc)
+	router := router.New(log, uc, c.HTTPServer)
 	srv := httpserver.New(httpserver.Config(c.HTTPServer), router)
 
 	log.Info("starting server", slog.String("address", c.HTTPServer.Address))
