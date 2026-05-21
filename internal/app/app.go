@@ -2,8 +2,10 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,12 +18,17 @@ import (
 	"github.com/Kbnh/url_shortener/internal/usecase"
 )
 
-func Run(ctx context.Context, log *slog.Logger, c config.Config) error {
+func Run(ctx context.Context, log *slog.Logger, c *config.Config) error {
 	storage, err := sqlite.New(c.Sqlite)
 	if err != nil {
 		log.Error("sqlite.New", slog.String("error", err.Error()))
 		return err
 	}
+	defer func() {
+		if err := storage.Close(); err != nil {
+			log.Error("failed to close storage", slog.Any("error", err))
+		}
+	}()
 
 	uc := usecase.New(storage)
 	router := router.New(log, uc, c.HTTPServer)
@@ -31,7 +38,7 @@ func Run(ctx context.Context, log *slog.Logger, c config.Config) error {
 
 	srvErr := make(chan error, 1)
 	go func() {
-		if err := srv.ListenAndServe(); err != nil {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			srvErr <- fmt.Errorf("server failed: %w", err)
 		}
 	}()

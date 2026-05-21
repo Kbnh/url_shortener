@@ -18,7 +18,7 @@ func main() {
 
 	ctx := context.Background()
 
-	err := app.Run(ctx, log, *cfg)
+	err := app.Run(ctx, log, cfg)
 	if err != nil {
 		log.Error("failed app run")
 		os.Exit(1)
