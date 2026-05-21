@@ -6,7 +6,13 @@ run:
 	go run ./cmd/url-shortener
 
 migrate-up:
-	migrate -path migrations -database "sqlite://$(DB_PATH)" up
-	
+	$(MAKE) migrate-action action=up
+
 migrate-down:
-	migrate -path migrations -database "sqlite://$(DB_PATH)" down
+	$(MAKE) migrate-action action=down
+
+migrate-action:
+	@docker compose --env-file .env run --rm url-shortener-migrate \
+		-path /migrations \
+		-database "sqlite3:///app/out/storage.db" \
+		$(action)
