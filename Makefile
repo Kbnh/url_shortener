@@ -1,18 +1,31 @@
-.PHONY: run migrate-up migrate-down
+env-up:
+	docker compose up -d
 
-DB_PATH ?= ./out/storage.db
+env-down:
+	docker compose down
 
-run:
-	go run ./cmd/url-shortener
+env-cleanup:
+	@read -p "Удалить локальную базу данных SQLite? [y/N]: " ans; \
+	if [ "$$ans" = "y" ] || [ "$$ans" = "Y" ]; then \
+		docker compose down; \
+		rm -rf ./out; \
+		echo "Папка ./out удалена"; \
+	else \
+		echo "Отменено"; \
+	fi
+
+migrate-create:
+	@if [ -z "$(seq)" ]; then \
+		echo "Ошибка: требуется параметр seq. Пример: make migrate-create seq=init"; \
+		exit 1; \
+	fi; \
+	migrate create -ext sql -dir ./migrations -seq "$(seq)"
 
 migrate-up:
-	$(MAKE) migrate-action action=up
+	migrate -path ./migrations -database "sqlite3://./out/storage.db" up
 
 migrate-down:
-	$(MAKE) migrate-action action=down
+	migrate -path ./migrations -database "sqlite3://./out/storage.db" down
 
-migrate-action:
-	@docker compose --env-file .env run --rm url-shortener-migrate \
-		-path /migrations \
-		-database "sqlite3:///app/out/storage.db" \
-		$(action)
+run:
+	docker compose pull && docker compose up -d

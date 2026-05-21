@@ -1,19 +1,9 @@
 services:
-  url-shortener-migrate:
-    image: migrate/migrate:v4.18.2
-    volumes:
-      - ./migrations:/migrations
-      - ./out:/app/out
-    command: -path=/migrations -database=sqlite3://${DB_PATH} up
-
   url-shortener-app:
     image: ${DOCKERHUB_USERNAME}/url-shortener:latest
     container_name: url-shortener
     ports:
       - "8080:8080"
-    depends_on:
-      url-shortener-migrate:
-        condition: service_completed_successfully
     env_file:
       - .env
     volumes:
